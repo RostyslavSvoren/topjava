@@ -30,4 +30,9 @@ public class UserMeal {
     public int getCalories() {
         return calories;
     }
+
+    public UserMealWithExceed withExceed(boolean exceeded) {
+        return new UserMealWithExceed(this.dateTime, this.description, this.calories, exceeded);
+    }
+
 }
