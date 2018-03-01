@@ -25,15 +25,20 @@ import static ru.javawebinar.topjava.util.TimeUtil.isBetween;
 public class UserMealsUtil {
     public static void main(String[] args) {
         List<UserMeal> mealList = Arrays.asList(
-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30,10,0), "Завтрак", 500),
-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30,13,0), "Обед", 1000),
-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30,20,0), "Ужин", 500),
-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31,10,0), "Завтрак", 1000),
-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31,13,0), "Обед", 500),
-                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31,20,0), "Ужин", 510)
+                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
+                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
+                new UserMeal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
+                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
+                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
+                new UserMeal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
         );
-        getFilteredWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12,0), 2000)
-        .forEach(System.out::println);
+        getFilteredWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000)
+                .forEach(System.out::println);
+        System.out.println("---------------------------------------------------------------------------------");
+        getFilteredWithExceededByCycle(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000)
+                .forEach(System.out::println);
+
+
 //        .toLocalDate();
 //        .toLocalTime();
     }
@@ -46,5 +51,22 @@ public class UserMealsUtil {
                 .filter(meal -> TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime))
                 .map(meal -> new UserMealWithExceed(meal.getDateTime(), meal.getDescription(), meal.getCalories(),
                         dateMap.get(meal.getDateTime().toLocalDate()) > caloriesPerDay)).collect(toList());
+    }
+
+
+    public static List<UserMealWithExceed> getFilteredWithExceededByCycle(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+        final Map<LocalDate, Integer> sortedByDayMap = new HashMap<>();
+        final List<UserMealWithExceed> resList = new ArrayList<>();
+
+        mealList.forEach(meal -> sortedByDayMap.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
+
+        mealList.forEach(meal -> {
+            final LocalDateTime localDateTime = meal.getDateTime();
+            if (TimeUtil.isBetween(localDateTime.toLocalTime(), startTime, endTime)) {
+                resList.add(new UserMealWithExceed(localDateTime, meal.getDescription(), meal.getCalories(), (sortedByDayMap.get(localDateTime.toLocalDate()) > caloriesPerDay)));
+            }
+        });
+
+        return resList;
     }
 }
