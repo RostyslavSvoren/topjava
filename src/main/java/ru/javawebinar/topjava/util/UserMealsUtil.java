@@ -56,10 +56,10 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExceed> getFilteredWithExceededByCycle(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         final Map<LocalDate, Integer> sortedByDayMap = new HashMap<>();
-        final List<UserMealWithExceed> resList = new ArrayList<>();
 
         mealList.forEach(meal -> sortedByDayMap.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
 
+        final List<UserMealWithExceed> resList = new ArrayList<>();
         mealList.forEach(meal -> {
             final LocalDateTime localDateTime = meal.getDateTime();
             if (TimeUtil.isBetween(localDateTime.toLocalTime(), startTime, endTime)) {
